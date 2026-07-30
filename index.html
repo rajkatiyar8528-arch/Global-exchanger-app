@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Exchanger - Download App</title>
+  <meta name="description" content="Global Exchanger — Send, Receive & Convert Currency. Download the Android app." />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, Arial, sans-serif; }
+    body { background: linear-gradient(160deg, #eef4ff 0%, #e8fff5 100%); color: #102033; min-height: 100vh; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: 32px 22px 60px; }
+    .logo-badge { width: 96px; height: 96px; margin: 0 auto 18px auto; border-radius: 28px; background: linear-gradient(135deg,#0967ff,#00c48c); display: flex; align-items: center; justify-content: center; box-shadow: 0 14px 34px rgba(9,103,255,.28); }
+    .logo-badge svg { display: block; }
+    h1 { text-align: center; font-size: 26px; font-weight: 900; margin-bottom: 6px; }
+    .tag { text-align: center; color: #5b6b80; font-size: 14px; margin-bottom: 26px; }
+    .referral-card { background: white; border: 2px solid #0967ff; border-radius: 20px; padding: 18px; margin-bottom: 22px; text-align: center; display: none; }
+    .referral-card.show { display: block; }
+    .referral-card .label { font-size: 12px; color: #5b6b80; font-weight: 700; margin-bottom: 6px; }
+    .referral-card .code { font-size: 22px; font-weight: 900; color: #0967ff; letter-spacing: 1px; margin-bottom: 6px; }
+    .referral-card .note { font-size: 12px; color: #5b6b80; }
+    .btn { display: block; width: 100%; text-align: center; text-decoration: none; border: 0; border-radius: 18px; padding: 18px 16px; font-size: 16px; font-weight: 900; cursor: pointer; margin-bottom: 14px; }
+    .btn.primary { background: #0967ff; color: white; box-shadow: 0 10px 24px rgba(9,103,255,.28); }
+    .btn.outline { background: white; color: #0967ff; border: 1px solid #d8e4ff; }
+    .card { background: white; border: 1px solid #e5edff; border-radius: 20px; padding: 18px; margin-bottom: 14px; box-shadow: 0 6px 18px rgba(12,55,120,.06); }
+    .card h3 { font-size: 14px; margin-bottom: 8px; }
+    .card p { font-size: 13px; color: #5b6b80; line-height: 1.5; }
+    .features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 22px; }
+    .feature { background: white; border: 1px solid #e5edff; border-radius: 16px; padding: 14px; text-align: center; }
+    .feature .icon { font-size: 22px; margin-bottom: 6px; }
+    .feature b { font-size: 12px; }
+    .footer-note { text-align: center; font-size: 11px; color: #8a97a8; margin-top: 20px; line-height: 1.6; }
+    .status-msg { text-align: center; font-size: 12px; color: #b07000; margin-bottom: 14px; display: none; }
+    .status-msg.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="logo-badge">
+      <svg width="52" height="52" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="none" stroke="#fff" stroke-width="4"/><path d="M18 34c10 10 20 10 30 0" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M42 20l9 9-9 9" fill="none" stroke="#00e0a4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><text x="15" y="31" fill="white" font-size="15" font-weight="900">GX</text></svg>
+    </div>
+    <h1>Global Exchanger</h1>
+    <p class="tag">Secure Money, Global Exchange — Send, Receive &amp; Convert Currency</p>
+
+    <div id="referralCard" class="referral-card">
+      <div class="label">🎁 Aapko Referral Code Mila Hai</div>
+      <div class="code" id="referralCodeText"></div>
+      <div class="note">App install karne ke baad, sign up karte waqt "Referral Code" field mein ye code daalna na bhoolein!</div>
+    </div>
+
+    <div id="statusMsg" class="status-msg"></div>
+    <a id="downloadBtn" class="btn primary" href="#">⬇️ Download Android App (APK)</a>
+    <a class="btn outline" href="https://github.com/rajkatiyar8528-arch/Global-exchanger-app/releases" target="_blank" rel="noopener">📦 All Versions / Releases dekhein</a>
+
+    <div class="features">
+      <div class="feature"><div class="icon">💱</div><b>Currency &amp; Crypto Exchange</b></div>
+      <div class="feature"><div class="icon">📤</div><b>Send &amp; Receive Money</b></div>
+      <div class="feature"><div class="icon">🔒</div><b>Secure KYC &amp; 2FA</b></div>
+      <div class="feature"><div class="icon">🎁</div><b>Referral Rewards</b></div>
+    </div>
+
+    <div class="card">
+      <h3>📲 Install Karne Ke Steps</h3>
+      <p>1. Upar "Download Android App" button dabayein.<br/>
+      2. Phone browser mein "Allow from this source" ka permission maang sakta hai — allow kar dein.<br/>
+      3. APK file khulte hi "Install" par tap karein.<br/>
+      4. App khol kar naya account banayein (upar diya referral code, agar hai, zaroor daalein).</p>
+    </div>
+
+    <div class="footer-note">
+      Global Exchanger ek regulated financial services app hai. Terms &amp; Privacy Policy padhne ke liye
+      <a href="./legal/terms.html">yahan click karein</a>.
+    </div>
+  </div>
+
+  <script>
+    // Fetches GitHub's public "latest release" API to always link to the
+    // most recently published APK, without ever needing to hand-edit this
+    // page's download link after every new app version — the automated
+    // Codemagic build (see codemagic.yaml) publishes a new GitHub Release
+    // with the APK attached after every successful build, and this page
+    // just always points at whatever GitHub currently reports as "latest".
+    const REPO = 'rajkatiyar8528-arch/Global-exchanger-app';
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusMsg = document.getElementById('statusMsg');
+
+    async function loadLatestRelease() {
+      try {
+        const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
+        if (!res.ok) throw new Error('no releases yet');
+        const data = await res.json();
+        const apkAsset = (data.assets || []).find(a => a.name.toLowerCase().endsWith('.apk'));
+        if (apkAsset) {
+          downloadBtn.href = apkAsset.browser_download_url;
+          statusMsg.textContent = `Latest version: ${data.tag_name || data.name || ''}`;
+          statusMsg.classList.add('show');
+        } else {
+          throw new Error('no apk asset found on latest release');
+        }
+      } catch (e) {
+        // Fallback: no GitHub Release published yet — point at the releases
+        // page itself so the user isn't stuck on a dead link.
+        downloadBtn.href = `https://github.com/${REPO}/releases`;
+        statusMsg.textContent = 'Download link jaldi hi update hoga. Abhi ke liye "All Versions" button try karein.';
+        statusMsg.classList.add('show');
+      }
+    }
+    loadLatestRelease();
+
+    // Show the referral code (passed as ?ref=CODE in the shared link) in a
+    // highlighted card, since a mobile browser link can't automatically
+    // carry that code INTO the not-yet-installed native app — the user has
+    // to manually type it into the app's Signup screen's "Referral Code"
+    // field themselves, so this page makes sure they don't forget/lose it.
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) {
+      document.getElementById('referralCodeText').textContent = ref.toUpperCase();
+      document.getElementById('referralCard').classList.add('show');
+    }
+  </script>
+</body>
+</html>
