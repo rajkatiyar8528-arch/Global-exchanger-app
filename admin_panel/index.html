@@ -416,16 +416,26 @@ let baseUrl = localStorage.getItem('gx_api') || 'https://global-exchanger.onrend
 document.getElementById('api').value = baseUrl;
 function headers(){return {'Content-Type':'application/json','Authorization':'Bearer '+token}}
 
+// FIX (15-min kick-out bug): showPanel() fires ~25 loaders in PARALLEL; when the
+// 15-minute access token expired, each one raced to refresh with the SAME rotating
+// refresh token → the 2nd+ calls looked like token REUSE → the server revoked the
+// whole session for security → admin got dumped back to the login screen.
+// Single-flight: everyone awaits ONE shared refresh, then retries with its result.
+let _refreshInFlight = null;
 async function tryRefreshToken(){
-  if(!refreshToken) return false;
-  try{
-    const r = await fetch(baseUrl+'/api/auth/refresh', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({refreshToken})});
-    if(!r.ok) { token=''; refreshToken=''; localStorage.removeItem('gx_admin_token'); localStorage.removeItem('gx_admin_refresh_token'); return false; }
-    const d = await r.json();
-    token = d.token; refreshToken = d.refreshToken;
-    localStorage.setItem('gx_admin_token', token); localStorage.setItem('gx_admin_refresh_token', refreshToken);
-    return true;
-  } catch(e){ return false; }
+  if(_refreshInFlight) return _refreshInFlight;
+  _refreshInFlight = (async()=>{
+    if(!refreshToken) return false;
+    try{
+      const r = await fetch(baseUrl+'/api/auth/refresh', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({refreshToken})});
+      if(!r.ok) { token=''; refreshToken=''; localStorage.removeItem('gx_admin_token'); localStorage.removeItem('gx_admin_refresh_token'); return false; }
+      const d = await r.json();
+      token = d.token; refreshToken = d.refreshToken;
+      localStorage.setItem('gx_admin_token', token); localStorage.setItem('gx_admin_refresh_token', refreshToken);
+      return true;
+    } catch(e){ return false; }
+  })().finally(()=>{ _refreshInFlight = null; });
+  return _refreshInFlight;
 }
 
 async function request(path, options={}){
