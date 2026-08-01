@@ -458,7 +458,7 @@ async function requestWithMeta(path, options={}){
 async function adminLogin(){
   baseUrl=document.getElementById('api').value.trim(); localStorage.setItem('gx_api',baseUrl);
   try{
-    const d=await request('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email.value,password:password.value,specialKey:specialKey.value})});
+    const d=await request('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email.value.trim(),password:password.value,specialKey:specialKey.value})});
     token=d.token; refreshToken=d.refreshToken;
     localStorage.setItem('gx_admin_token',token); localStorage.setItem('gx_admin_refresh_token',refreshToken);
     password.value=''; specialKey.value=''; showPanel();
