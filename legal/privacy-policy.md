@@ -21,7 +21,7 @@ described in this Policy.
 
 - **Data Fiduciary**: [INSERT LEGAL ENTITY NAME]
 - **Registered address**: [INSERT]
-- **Data Protection / Grievance Officer contact**: privacy@globalexchanger.com
+- **Data Protection / Grievance Officer contact**: globalexchangersupport@gmail.com
   (see our Grievance Redressal Policy for full process and timelines)
 
 ## 2. Personal Data We Collect
@@ -169,7 +169,7 @@ Under the DPDP Act, 2023 and applicable law, you have the right to:
   Protection Officer, and if unresolved, with the Data Protection Board of
   India.
 
-To exercise any of these rights, contact us at privacy@globalexchanger.com.
+To exercise any of these rights, contact us at globalexchangersupport@gmail.com.
 We will respond within the timelines specified in our Grievance Redressal
 Policy (acknowledgement within 48 hours, resolution target within 30 days,
 or as required by applicable law).
@@ -216,9 +216,9 @@ taking effect, where required by law.
 
 ## 14. Contact Us
 
-- **Support Email**: support@globalexchanger.com
-- **Privacy / Data Protection Officer Email**: privacy@globalexchanger.com
-- **Grievance Officer Email**: grievance@globalexchanger.com
+- **Support Email**: globalexchangersupport@gmail.com
+- **Privacy / Data Protection Officer Email**: globalexchangersupport@gmail.com
+- **Grievance Officer Email**: globalexchangersupport@gmail.com
 - **Privacy Policy URL**: https://globalexchanger.com/privacy-policy
 - **Registered Address**: [TO BE FILLED]
 

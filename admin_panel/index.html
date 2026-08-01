@@ -206,6 +206,11 @@
         <button class="btn dark" style="margin-top:16px;width:100%" onclick="submitKycReject()">Reject & Notify User</button>
       </div>
     </div>
+    <div class="card row"><h2>🔓 Recovery Requests <span id="recoveryPendingPill" class="pill" style="background:#fff4e0;color:#b45309"></span></h2><button class="btn" onclick="loadRecovery()">Refresh Recovery</button></div>
+    <div class="card">
+      <p style="font-size:12px;color:#666;margin:-4px 0 10px">No-login account-recovery requests (2FA lockout etc) — app ke 2FA/login screens se aati hain. Unlock karne se PEHLE identity verify zaroor karein (registered email + KYC details match).</p>
+      <table class="table"><thead><tr><th>Email</th><th>Account</th><th>Reason</th><th>Message</th><th>Time</th><th>Action</th></tr></thead><tbody id="recoveryBody"></tbody></table>
+    </div>
     <div class="card row"><h2>Users</h2><button class="btn" onclick="loadUsers()">Refresh Users</button></div>
     <div class="card">
       <div class="toolbar">
@@ -466,7 +471,7 @@ function logout(){
   token=''; refreshToken=''; login.style.display='block'; panel.style.display='none';
   if(alertsPollTimer){ clearInterval(alertsPollTimer); alertsPollTimer = null; }
 }
-function showPanel(){login.style.display='none'; panel.style.display='block'; apiLabel.textContent='API: '+baseUrl; loadDashboard(); startAlertsPolling(); loadPushStatus(); loadBroadcastHistory(); loadAnalytics(); loadAdmins(); loadUsers(); loadExchange(); loadKyc(); loadTransactions(); loadPayments(); loadDisputes(); loadComplaints(); loadReferrals(); loadBankAccounts(); loadWithdrawals(); loadAudit(); loadAmlFlags(); loadTdsRecords(); loadSanctionsFlags(); loadTravelRuleRecords(); loadStrReports(); loadScheduledPayments(); loadPriceAlerts(); loadWatchlistSummary(); loadFullLeaderboard();}
+function showPanel(){login.style.display='none'; panel.style.display='block'; apiLabel.textContent='API: '+baseUrl; loadDashboard(); startAlertsPolling(); loadPushStatus(); loadBroadcastHistory(); loadAnalytics(); loadAdmins(); loadUsers(); loadRecovery(); loadExchange(); loadKyc(); loadTransactions(); loadPayments(); loadDisputes(); loadComplaints(); loadReferrals(); loadBankAccounts(); loadWithdrawals(); loadAudit(); loadAmlFlags(); loadTdsRecords(); loadSanctionsFlags(); loadTravelRuleRecords(); loadStrReports(); loadScheduledPayments(); loadPriceAlerts(); loadWatchlistSummary(); loadFullLeaderboard();}
 async function sendBroadcast(){
   const title = document.getElementById('broadcastTitle').value.trim();
   const message = document.getElementById('broadcastMessage').value.trim();
@@ -757,6 +762,45 @@ async function emergencyDisable2fa(userId, userEmail){
   }catch(e){
     alert('❌ Error: ' + (e.message || e));
   }
+}
+async function loadRecovery(){
+  try{
+    const rows = await request('/api/admin/recovery-requests');
+    const pend = (rows||[]).filter(r=>r.status==='pending').length;
+    const pill = document.getElementById('recoveryPendingPill');
+    if(pill) pill.textContent = pend ? ` ${pend} pending ` : '';
+    recoveryBody.innerHTML = (rows||[]).length ? rows.map(r=>{
+      const acct = r.user_id
+        ? `${escapeHtml(r.user_name||'')}<br><span class="pill">${escapeHtml(r.kyc_status||'')}</span> <span class="pill" style="background:${r.totp_enabled?'#e8fff5':'#f3f4f6'};color:${r.totp_enabled?'#00935e':'#666'}">2FA ${r.totp_enabled?'ON':'OFF'}</span>`
+        : '<span class="pill" style="background:#ffe9e9;color:#b91c1c">no matching account</span>';
+      const when = (r.created_at||'').replace('T',' ').slice(0,16);
+      const act = r.status==='pending'
+        ? `${r.user_id && r.totp_enabled ? `<button class="btn sm" onclick="recoveryUnlock2fa('${r.id}','${r.user_id}','${escapeHtml(r.email).replace(/'/g,"&#39;")}')">🔓 Unlock 2FA</button> ` : ''}<button class="btn outline sm" onclick="recoveryResolve('${r.id}','resolved')">✅ Resolve</button> <button class="btn dark sm" onclick="recoveryResolve('${r.id}','dismissed')">🗑 Dismiss</button>`
+        : `<span class="pill">${r.status}</span>`;
+      return `<tr><td><b>${escapeHtml(r.email)}</b></td><td>${acct}</td><td>${escapeHtml(r.reason||'')}</td><td style="max-width:280px">${escapeHtml(r.message||'')}</td><td>${when}</td><td>${act}</td></tr>`;
+    }).join('') : '<tr><td colspan="6" style="text-align:center;color:#888">Koi recovery request nahi — sab clear! ✅</td></tr>';
+  }catch(e){ recoveryBody.innerHTML = `<tr><td colspan="6">Error: ${escapeHtml(e.message||e)}</td></tr>`; }
+}
+async function recoveryUnlock2fa(reqId, userId, email){
+  if(!confirm(`IDENTITY VERIFY ho gayi?
+
+- Email ${email} registered hai
+- Naam + KYC details match ho gayi?
+
+OK dabate hi ${email} ka 2FA UNLOCK ho jayega — user phir sirf password se login karega.`)) return;
+  try{
+    await request(`/api/admin/users/${userId}/disable-2fa`, {method:'POST', headers:headers()});
+    await request(`/api/admin/recovery-requests/${reqId}`, {method:'PATCH', headers:headers(), body:JSON.stringify({status:'resolved', adminNote:'2FA unlocked after identity verification'})});
+    alert(`✅ ${email} ka 2FA unlock ho gaya. User ko bata dein: ab sirf password se login karein, phir app mein 2FA dobara setup karein.`);
+    loadRecovery(); loadUsers();
+  }catch(e){ alert('Error: '+(e.message||e)); }
+}
+async function recoveryResolve(id, status){
+  const note = prompt(status==='resolved' ? 'Resolution note (optional):' : 'Dismiss reason (optional):') || '';
+  try{
+    await request(`/api/admin/recovery-requests/${id}`, {method:'PATCH', headers:headers(), body:JSON.stringify({status, adminNote:note})});
+    loadRecovery();
+  }catch(e){ alert('Error: '+(e.message||e)); }
 }
 async function loadUsers(){
   const search = document.getElementById('usersSearch')?.value.trim() || '';

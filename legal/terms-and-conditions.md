@@ -268,7 +268,7 @@ process, and response-time commitments are set out in our separate
 **Grievance Redressal Policy**. In brief:
 
 - **Grievance Officer**: [INSERT NAME]
-- **Email**: grievance@globalexchanger.com
+- **Email**: globalexchangersupport@gmail.com
 - **Acknowledgement**: within 48 hours of receipt
 - **Resolution target**: within 30 days of receipt, or as required by
   applicable law
@@ -301,8 +301,8 @@ Terms.
 
 ## 20. Contact Us
 
-- **Support Email**: support@globalexchanger.com
-- **Grievance Officer Email**: grievance@globalexchanger.com
+- **Support Email**: globalexchangersupport@gmail.com
+- **Grievance Officer Email**: globalexchangersupport@gmail.com
 - **Terms URL**: https://globalexchanger.com/terms
 - **Registered Address**: [TO BE FILLED]
 

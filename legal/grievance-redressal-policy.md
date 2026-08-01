@@ -30,14 +30,14 @@ Grievance Officer:
 
 - **Name**: [INSERT NAME OF DESIGNATED PERSON]
 - **Designation**: [INSERT — e.g. "Compliance & Grievance Officer"]
-- **Email**: grievance@globalexchanger.com
+- **Email**: globalexchangersupport@gmail.com
 - **Registered address for postal grievances**: [INSERT ADDRESS]
 - **Working hours**: [INSERT — e.g. "Monday-Saturday, 10:00 AM - 6:00 PM IST"]
 
 For data protection / privacy-specific grievances specifically (as
 distinct from general service complaints), you may also write to:
 
-- **Data Protection Officer / Privacy contact**: privacy@globalexchanger.com
+- **Data Protection Officer / Privacy contact**: globalexchangersupport@gmail.com
 
 ## 3. What Counts as a Grievance
 
@@ -60,7 +60,7 @@ of preference (in-app is fastest for transaction-specific issues):
 
 1. **In-app**: Support → Complaints or Disputes tab — provide transaction
    ID (if applicable) and a clear description.
-2. **Email**: grievance@globalexchanger.com — include your registered
+2. **Email**: globalexchangersupport@gmail.com — include your registered
    email/phone, a description of the issue, and any relevant transaction
    IDs or screenshots.
 3. **Post**: [INSERT REGISTERED ADDRESS], if email/app access is not
@@ -122,10 +122,10 @@ retention terms.
 
 ## 9. Contact Summary
 
-- **General Grievances**: grievance@globalexchanger.com
-- **Data/Privacy Grievances**: privacy@globalexchanger.com
-- **Payments Grievances**: payments@globalexchanger.com
-- **General Support**: support@globalexchanger.com
+- **General Grievances**: globalexchangersupport@gmail.com
+- **Data/Privacy Grievances**: globalexchangersupport@gmail.com
+- **Payments Grievances**: globalexchangersupport@gmail.com
+- **General Support**: globalexchangersupport@gmail.com
 
 ---
 *This document was drafted with AI assistance as of 14 July 2026.

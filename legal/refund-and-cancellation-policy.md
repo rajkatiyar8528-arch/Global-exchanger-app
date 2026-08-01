@@ -24,7 +24,7 @@ requests made through the Global Exchanger app.
   your wallet balance** within 30 minutes:
   1. Do not attempt the payment again immediately — check your
      Transaction History first.
-  2. Contact support at support@globalexchanger.com or raise a Complaint
+  2. Contact support at globalexchangersupport@gmail.com or raise a Complaint
      in-app with the payment reference/UTR number.
   3. We will investigate against Razorpay's transaction logs. If the
      payment was deducted but genuinely not credited to your wallet due to
@@ -109,7 +109,7 @@ requests made through the Global Exchanger app.
 ## 7. Disputes and Chargebacks
 
 - If you believe a charge was unauthorized or fraudulent, contact us
-  immediately via the in-app Dispute feature or support@globalexchanger.com
+  immediately via the in-app Dispute feature or globalexchangersupport@gmail.com
   with full details, before initiating a chargeback with your bank/card
   issuer, so we can investigate promptly.
 - We reserve the right to contest chargebacks that we can demonstrate were
@@ -131,8 +131,8 @@ requests made through the Global Exchanger app.
 
 ## 9. Contact
 
-- **Support Email**: support@globalexchanger.com
-- **Refunds/Payments queries**: payments@globalexchanger.com
+- **Support Email**: globalexchangersupport@gmail.com
+- **Refunds/Payments queries**: globalexchangersupport@gmail.com
 - **Refund Policy URL**: https://globalexchanger.com/refund-policy
 
 ---
