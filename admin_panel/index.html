@@ -432,17 +432,40 @@ async function tryRefreshToken(){
     const saved = localStorage.getItem('gx_admin_refresh_token');
     if(saved) refreshToken = saved;
     if(!refreshToken){ sessionEndReason = 'Saved session nahi mili — dobara login karein.'; return false; }
-    let r;
-    try{
-      r = await fetch(baseUrl+'/api/auth/refresh', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({refreshToken})});
-    }catch(e){
+    // Ek refresh attempt ko helper mein rakha — ROTATED_RECENTLY par naye token
+    // se dobara try kar sakein.
+    const attempt = async (rt) => {
+      try{
+        const rr = await fetch(baseUrl+'/api/auth/refresh', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({refreshToken: rt})});
+        let dd = {};
+        try{ dd = await rr.json(); }catch(e){}
+        return { r: rr, d: dd, network: false };
+      }catch(e){ return { r: null, d: {}, network: true }; }
+    };
+    let out = await attempt(refreshToken);
+    if(out.network){
       // NETWORK fail (Render waking up / data off) — session abhi bhi VALID ho sakti
       // hai. Tokens delete mat karo; sirf refresh skip karo, retry par chal jayega.
       sessionEndReason = 'NETWORK: refresh call fail';
       return false;
     }
-    let d = {};
-    try{ d = await r.json(); }catch(e){}
+    if(out.r.status === 409 && out.d.code === 'ROTATED_RECENTLY'){
+      // Doosre tab / parallel request ne ABHI-ABHI rotate kiya. Kuch revoke nahi
+      // hua — localStorage se sabse naya token padh kar EK baar retry karo.
+      await new Promise(res => setTimeout(res, 400)); // doosre tab ko save karne ka moaka
+      const latest = localStorage.getItem('gx_admin_refresh_token');
+      if(latest && latest !== refreshToken){
+        refreshToken = latest;
+        out = await attempt(latest);
+        if(out.network){ sessionEndReason = 'NETWORK: refresh call fail'; return false; }
+      } else {
+        // Naya token abhi tak dikh nahi raha — soft fail, session clear MAT karo;
+        // agli baar page/loader retry par sab theek ho jayega.
+        sessionEndReason = 'NETWORK: parallel refresh race — page dobara kholkar try karo';
+        return false;
+      }
+    }
+    const r = out.r, d = out.d;
     if(!r.ok){
       // Server ne refresh mana kar diya — AB session sach mein khatam. Reason ko
       // login screen par dikhao taaki exact cause pata chale (reused / expired).
