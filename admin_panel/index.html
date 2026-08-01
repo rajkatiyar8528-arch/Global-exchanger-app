@@ -20,6 +20,7 @@
     <input id="password" class="input" value="" type="password" placeholder="Password">
     <input id="specialKey" class="input" value="" type="password" placeholder="Special Key">
     <button class="btn" onclick="adminLogin()">Login Admin</button>
+<div style="font-size:11px;color:#94a3b8;margin-top:10px;text-align:center">Panel build: 01-Aug-2026 v4 · kickout-diag</div>
     <p id="loginErr" class="err"></p>
   </section>
 
@@ -506,7 +507,12 @@ async function requestWithMeta(path, options={}){
     }
   }
   if(!r.ok){
-    if(r.status === 401){ logout(sessionEndReason || ''); }
+    if(r.status === 401){
+      // TOKEN_EXPIRED ke alawa bhi 401 aa sakta hai ('Invalid token', 'Missing
+      // token' aadi) — unme sessionEndReason khali rehta tha aur kick-out SILENT
+      // ho jaata tha. Ab HAMESHA exact server message dikhao.
+      logout(sessionEndReason || ('Session khatam: ' + (d.error || 'unknown — page reload karke dobara try karein')));
+    }
     throw new Error(d.error||sessionEndReason||'API error');
   }
   return { data: d, response: r };
