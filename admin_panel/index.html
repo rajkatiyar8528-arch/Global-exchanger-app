@@ -422,18 +422,39 @@ function headers(){return {'Content-Type':'application/json','Authorization':'Be
 // whole session for security → admin got dumped back to the login screen.
 // Single-flight: everyone awaits ONE shared refresh, then retries with its result.
 let _refreshInFlight = null;
+let sessionEndReason = '';
 async function tryRefreshToken(){
   if(_refreshInFlight) return _refreshInFlight;
   _refreshInFlight = (async()=>{
-    if(!refreshToken) return false;
+    // Cross-tab safety: hamesha localStorage se LATEST token padho — agar doosre
+    // tab ne rotate kar diya ho to is tab ka in-memory purana token server ko
+    // "reuse/replay attack" lagega aur poori session revoke ho jayegi.
+    const saved = localStorage.getItem('gx_admin_refresh_token');
+    if(saved) refreshToken = saved;
+    if(!refreshToken){ sessionEndReason = 'Saved session nahi mili — dobara login karein.'; return false; }
+    let r;
     try{
-      const r = await fetch(baseUrl+'/api/auth/refresh', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({refreshToken})});
-      if(!r.ok) { token=''; refreshToken=''; localStorage.removeItem('gx_admin_token'); localStorage.removeItem('gx_admin_refresh_token'); return false; }
-      const d = await r.json();
-      token = d.token; refreshToken = d.refreshToken;
-      localStorage.setItem('gx_admin_token', token); localStorage.setItem('gx_admin_refresh_token', refreshToken);
-      return true;
-    } catch(e){ return false; }
+      r = await fetch(baseUrl+'/api/auth/refresh', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({refreshToken})});
+    }catch(e){
+      // NETWORK fail (Render waking up / data off) — session abhi bhi VALID ho sakti
+      // hai. Tokens delete mat karo; sirf refresh skip karo, retry par chal jayega.
+      sessionEndReason = 'NETWORK: refresh call fail';
+      return false;
+    }
+    let d = {};
+    try{ d = await r.json(); }catch(e){}
+    if(!r.ok){
+      // Server ne refresh mana kar diya — AB session sach mein khatam. Reason ko
+      // login screen par dikhao taaki exact cause pata chale (reused / expired).
+      sessionEndReason = 'Session khatam: ' + (d.error || ('HTTP '+r.status));
+      token=''; refreshToken='';
+      localStorage.removeItem('gx_admin_token'); localStorage.removeItem('gx_admin_refresh_token');
+      return false;
+    }
+    token = d.token; refreshToken = d.refreshToken;
+    localStorage.setItem('gx_admin_token', token); localStorage.setItem('gx_admin_refresh_token', refreshToken);
+    sessionEndReason = '';
+    return true;
   })().finally(()=>{ _refreshInFlight = null; });
   return _refreshInFlight;
 }
@@ -456,11 +477,14 @@ async function requestWithMeta(path, options={}){
       if(retryOptions.headers) retryOptions.headers = {...retryOptions.headers, ...headers()};
       r = await fetch(baseUrl+path, retryOptions);
       d = await r.json().catch(()=>({}));
+    } else if(sessionEndReason && sessionEndReason.indexOf('NETWORK:') === 0){
+      // Refresh fail hua NETWORK ki wajah se, session ki wajah se NAHI — logout mat karo.
+      throw new Error('Network ya Render thoda slow tha — 30 second baad page refresh karke try karo. (Session safe hai.)');
     }
   }
   if(!r.ok){
-    if(r.status === 401){ logout(); }
-    throw new Error(d.error||'API error');
+    if(r.status === 401){ logout(sessionEndReason || ''); }
+    throw new Error(d.error||sessionEndReason||'API error');
   }
   return { data: d, response: r };
 }
@@ -475,13 +499,27 @@ async function adminLogin(){
   }
   catch(e){loginErr.textContent=e.message}
 }
-function logout(){
+function logout(reason){
   if(refreshToken){ fetch(baseUrl+'/api/auth/logout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken})}).catch(()=>{}); }
   localStorage.removeItem('gx_admin_token'); localStorage.removeItem('gx_admin_refresh_token');
   token=''; refreshToken=''; login.style.display='block'; panel.style.display='none';
   if(alertsPollTimer){ clearInterval(alertsPollTimer); alertsPollTimer = null; }
+  stopProactiveRefresh();
+  if(reason){ loginErr.textContent = reason; }
 }
-function showPanel(){login.style.display='none'; panel.style.display='block'; apiLabel.textContent='API: '+baseUrl; loadDashboard(); startAlertsPolling(); loadPushStatus(); loadBroadcastHistory(); loadAnalytics(); loadAdmins(); loadUsers(); loadRecovery(); loadExchange(); loadKyc(); loadTransactions(); loadPayments(); loadDisputes(); loadComplaints(); loadReferrals(); loadBankAccounts(); loadWithdrawals(); loadAudit(); loadAmlFlags(); loadTdsRecords(); loadSanctionsFlags(); loadTravelRuleRecords(); loadStrReports(); loadScheduledPayments(); loadPriceAlerts(); loadWatchlistSummary(); loadFullLeaderboard();}
+
+// Proactive session keep-alive: har 13 minute mein access token PEHLE se hi refresh
+// karo — 15-minute expiry par ~25 loaders ek saath 401 na marein (wahi race jo
+// kick-out karati thi). Login / page-open dono par chalu hota hai.
+let _proactiveRefreshTimer = null;
+function startProactiveRefresh(){
+  stopProactiveRefresh();
+  _proactiveRefreshTimer = setInterval(()=>{ tryRefreshToken(); }, 13*60*1000);
+}
+function stopProactiveRefresh(){
+  if(_proactiveRefreshTimer){ clearInterval(_proactiveRefreshTimer); _proactiveRefreshTimer = null; }
+}
+function showPanel(){login.style.display='none'; panel.style.display='block'; apiLabel.textContent='API: '+baseUrl; loadDashboard(); startAlertsPolling(); loadPushStatus(); loadBroadcastHistory(); loadAnalytics(); loadAdmins(); loadUsers(); loadRecovery(); loadExchange(); loadKyc(); loadTransactions(); loadPayments(); loadDisputes(); loadComplaints(); loadReferrals(); loadBankAccounts(); loadWithdrawals(); loadAudit(); loadAmlFlags(); loadTdsRecords(); loadSanctionsFlags(); loadTravelRuleRecords(); loadStrReports(); loadScheduledPayments(); loadPriceAlerts(); loadWatchlistSummary(); loadFullLeaderboard(); startProactiveRefresh();}
 async function sendBroadcast(){
   const title = document.getElementById('broadcastTitle').value.trim();
   const message = document.getElementById('broadcastMessage').value.trim();
