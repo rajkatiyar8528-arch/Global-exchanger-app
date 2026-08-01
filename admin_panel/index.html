@@ -20,7 +20,7 @@
     <input id="password" class="input" value="" type="password" placeholder="Password">
     <input id="specialKey" class="input" value="" type="password" placeholder="Special Key">
     <button class="btn" onclick="adminLogin()">Login Admin</button>
-<div style="font-size:11px;color:#94a3b8;margin-top:10px;text-align:center">Panel build: 01-Aug-2026 v4 · kickout-diag</div>
+<div style="font-size:11px;color:#94a3b8;margin-top:10px;text-align:center">Panel build: 01-Aug-2026 v5 · kickout-fixed</div>
     <p id="loginErr" class="err"></p>
   </section>
 
@@ -492,6 +492,13 @@ async function request(path, options={}){
 // that need a response header (e.g. `X-Total-Count` for pagination) can
 // read it — request() alone only ever returned the parsed JSON body.
 async function requestWithMeta(path, options={}){
+  // Auto-auth: login ke baad HAR request par khud Bearer token lagao — kisi
+  // loader ka headers() likhna bhoolna ab bhi instant kick-out nahi banayega
+  // (Recovery v2 'Missing token' incident). Public calls (login) tab tak token
+  // set hi nahi hota, to un par kuch attach nahi hoga.
+  if(token && !(options.headers && options.headers.Authorization)){
+    options = {...options, headers: {...headers(), ...(options.headers||{})}};
+  }
   let r=await fetch(baseUrl+path, options);
   let d=await r.json().catch(()=>({}));
   if(r.status === 401 && d.code === 'TOKEN_EXPIRED'){
@@ -842,7 +849,7 @@ async function emergencyDisable2fa(userId, userEmail){
 }
 async function loadRecovery(){
   try{
-    const rows = await request('/api/admin/recovery-requests');
+    const rows = await request('/api/admin/recovery-requests', {headers:headers()});
     const pend = (rows||[]).filter(r=>r.status==='pending').length;
     const pill = document.getElementById('recoveryPendingPill');
     if(pill) pill.textContent = pend ? ` ${pend} pending ` : '';
